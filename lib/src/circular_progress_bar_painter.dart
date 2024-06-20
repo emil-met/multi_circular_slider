@@ -17,6 +17,8 @@ class CircularProgressBarPainter extends CustomPainter {
   //list of colors
   final List<Color> colors;
 
+  final List<String> labels;
+
   //color of track
   final Color trackColor;
 
@@ -27,6 +29,7 @@ class CircularProgressBarPainter extends CustomPainter {
     this.progressBarWidth = 32.0,
     required this.values,
     required this.colors,
+    this.labels = const [],
     this.trackColor = Colors.grey,
   });
 
@@ -56,6 +59,9 @@ class CircularProgressBarPainter extends CustomPainter {
       startAngle,
       trackSweepAngle,
       shadowPaint,
+      '',
+      0,
+      0,
     );
 
     //progress bar track paint
@@ -71,6 +77,9 @@ class CircularProgressBarPainter extends CustomPainter {
       startAngle,
       trackSweepAngle,
       trackPaint,
+      '',
+      0,
+      0,
     );
 
     //length of list
@@ -100,6 +109,10 @@ class CircularProgressBarPainter extends CustomPainter {
           startAngle: startAngle,
           sweepAngle: sweepAngle,
           paint: progressBarPaint,
+          name: labels[i],
+          value: values[i],
+          prevSweepAngle:
+              (progressBars.isNotEmpty) ? progressBars.first.sweepAngle : 0.0,
         ),
       );
     }
@@ -112,6 +125,9 @@ class CircularProgressBarPainter extends CustomPainter {
         progressBar.startAngle,
         progressBar.sweepAngle,
         progressBar.paint,
+        progressBar.name,
+        progressBar.value,
+        progressBar.prevSweepAngle,
       );
     }
   }
@@ -123,6 +139,9 @@ class CircularProgressBarPainter extends CustomPainter {
     double startAngle,
     double sweepAngle,
     Paint paint,
+    String name,
+    double value,
+    double prevSweepAngle,
   ) {
     double radius = size.width / 2;
     Offset center = Offset(
@@ -140,11 +159,55 @@ class CircularProgressBarPainter extends CustomPainter {
       false,
       paint,
     );
+
+    final previousRadians = (startAngle + prevSweepAngle);
+
+    final currentRadians = (startAngle + sweepAngle);
+
+    final radians = currentRadians - ((currentRadians - previousRadians) / 2);
+
+    final x = (radius) * math.cos(radians);
+    final y = (radius) * math.sin(radians);
+    final side = math.min(size.width, size.height);
+
+    _drawName(canvas, name, x * 1.4, y * 1.2, side);
   }
 
   ///[Logic for converting degree to radians]
   degreeToRadians(double degree) {
     return degree * (math.pi / 180);
+  }
+
+  void _drawName(
+    Canvas canvas,
+    String? name,
+    double x,
+    double y,
+    double side, {
+    TextStyle? style,
+  }) {
+    final span = TextSpan(
+      style: TextStyle(color: Color(0xFF000000)),
+      text: name,
+    );
+
+    TextPainter tp = TextPainter(
+      text: span,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    tp.layout();
+
+    var dx = (side / 2 + x) - (tp.width / 2);
+    var dy = (side / 2 + y) - (tp.height / 2);
+
+    tp.paint(
+      canvas,
+      Offset(
+        dx,
+        dy,
+      ),
+    );
   }
 
   @override
@@ -158,10 +221,16 @@ class CircularShader {
   final double startAngle;
   final double sweepAngle;
   final Paint paint;
+  final String name;
+  final double value;
+  final double prevSweepAngle;
 
   CircularShader({
     required this.startAngle,
     required this.sweepAngle,
     required this.paint,
+    required this.name,
+    required this.value,
+    required this.prevSweepAngle,
   });
 }

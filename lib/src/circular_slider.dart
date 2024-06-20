@@ -21,6 +21,7 @@ class MultiCircularSlider extends StatefulWidget {
   final double progressBarWidth;
   final List<double> values;
   final List<Color> colors;
+  final List<String> labels;
   final Color trackColor;
   final Duration animationDuration;
   final Curve animationCurve;
@@ -115,6 +116,7 @@ class MultiCircularSlider extends StatefulWidget {
     required this.colors,
     required this.size,
     required this.progressBarType,
+    this.labels = const [],
     this.trackWidth = 32.0,
     this.progressBarWidth = 32.0,
     this.trackColor = Colors.grey,
@@ -132,7 +134,8 @@ class MultiCircularSlider extends StatefulWidget {
   MultiCircularSliderState createState() => MultiCircularSliderState();
 }
 
-class MultiCircularSliderState extends State<MultiCircularSlider> with SingleTickerProviderStateMixin {
+class MultiCircularSliderState extends State<MultiCircularSlider>
+    with SingleTickerProviderStateMixin {
   //for animation
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -150,13 +153,15 @@ class MultiCircularSliderState extends State<MultiCircularSlider> with SingleTic
     }
 
     //initializing controller
-    _controller = AnimationController(vsync: this, duration: widget.animationDuration);
+    _controller =
+        AnimationController(vsync: this, duration: widget.animationDuration);
 
     //initializing animation
     _animation = Tween(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: widget.animationCurve));
+    ).animate(
+        CurvedAnimation(parent: _controller, curve: widget.animationCurve));
 
     //starting animation
     _controller.forward();
@@ -177,7 +182,9 @@ class MultiCircularSliderState extends State<MultiCircularSlider> with SingleTic
       animation: _animation,
       builder: (BuildContext context, Widget? child) {
         //custom painter to draw multiple progress bar
-        return widget.progressBarType == MultiCircularSliderType.circular ? _buildCircularProgressBar() : _buildLinearProgressBar();
+        return widget.progressBarType == MultiCircularSliderType.circular
+            ? _buildCircularProgressBar()
+            : _buildLinearProgressBar();
       },
       child: widget.innerWidget ?? const SizedBox.shrink(),
     );
@@ -254,23 +261,27 @@ class MultiCircularSliderState extends State<MultiCircularSlider> with SingleTic
         ],
       );
 
-  CustomPainter _buildProgressBarPainter() => widget.progressBarType == MultiCircularSliderType.circular
-      ? CircularProgressBarPainter(
-          size: widget.size,
-          values: List.generate(widget.values.length, (index) => widget.values[index] * _animation.value),
-          colors: widget.colors,
-          progressBarWidth: widget.progressBarWidth,
-          trackColor: widget.trackColor,
-          trackWidth: widget.trackWidth,
-        )
-      : LinearProgressBarPainter(
-          size: widget.size,
-          values: List.generate(widget.values.length, (index) => widget.values[index] * _animation.value),
-          colors: widget.colors,
-          progressBarWidth: widget.progressBarWidth,
-          trackColor: widget.trackColor,
-          trackWidth: widget.trackWidth,
-        );
+  CustomPainter _buildProgressBarPainter() =>
+      widget.progressBarType == MultiCircularSliderType.circular
+          ? CircularProgressBarPainter(
+              size: widget.size,
+              values: List.generate(widget.values.length,
+                  (index) => widget.values[index] * _animation.value),
+              colors: widget.colors,
+              labels: widget.labels,
+              progressBarWidth: widget.progressBarWidth,
+              trackColor: widget.trackColor,
+              trackWidth: widget.trackWidth,
+            )
+          : LinearProgressBarPainter(
+              size: widget.size,
+              values: List.generate(widget.values.length,
+                  (index) => widget.values[index] * _animation.value),
+              colors: widget.colors,
+              progressBarWidth: widget.progressBarWidth,
+              trackColor: widget.trackColor,
+              trackWidth: widget.trackWidth,
+            );
 
   Widget _buildInnerIcon() => widget.innerIcon ?? const SizedBox.shrink();
 
