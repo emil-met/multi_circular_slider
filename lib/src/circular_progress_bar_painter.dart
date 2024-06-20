@@ -39,48 +39,6 @@ class CircularProgressBarPainter extends CustomPainter {
     const double baseAngle = 180.0;
     //actual starting angle of arc
     final double startAngle = degreeToRadians(baseAngle);
-    //total length of the track of progressbar
-    final double trackSweepAngle = degreeToRadians(baseAngle);
-
-    //shadow paint
-    final shadowPaint = Paint()
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke
-      ..color = Colors.black.withOpacity(0.1)
-      ..maskFilter = const MaskFilter.blur(
-        BlurStyle.normal,
-        10.0,
-      )
-      ..strokeWidth = trackWidth;
-    //draw shadow
-    drawCurve(
-      canvas,
-      size,
-      startAngle,
-      trackSweepAngle,
-      shadowPaint,
-      '',
-      0,
-      0,
-    );
-
-    //progress bar track paint
-    final trackPaint = Paint()
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke
-      ..color = trackColor
-      ..strokeWidth = trackWidth;
-    //progress bar track curve
-    drawCurve(
-      canvas,
-      size,
-      startAngle,
-      trackSweepAngle,
-      trackPaint,
-      '',
-      0,
-      0,
-    );
 
     //length of list
     int length = values.length;
